@@ -2,6 +2,7 @@
 
 import requests
 import pickle
+from email_alert import send_alert
 
 default_cache = './temp/url_cache.bin'
 
@@ -39,9 +40,11 @@ def main():
         if url == 'quit':
             break
 
-        #print results
+        #email and print results
         results = cache.url_diff(url)
         print(results)
+        send_alert(results, ['ratherBrehearsin@yahoo.com'])
+
         
         #update the cache
         cache.cache[url] = results

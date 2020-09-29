@@ -7,6 +7,7 @@ from collections import defaultdict
 import time
 from email_alert import send_alert
 import logging
+import argparse
 
 class config:
     def __init__(self, rules, recipients, interval):
@@ -22,16 +23,16 @@ class config:
         return config(config_map['rules'], config_map['recipients'], config_map['check_interval'])
 
 default_cache = './temp/url_cache.bin'
-default_config = './config.json'
 
 class url_cache:
     def __init__(self):
         self.cache = defaultdict(str)
 
 class daemon:
-    def __init__(self, config, state):
+    def __init__(self, config, state, path):
         self.config = config
         self.state = state
+        self.cache_path = path
 
     def start(self):
         logging.info('Starting daemon')
@@ -53,17 +54,22 @@ class daemon:
             #write the cache, sleep
             logging.info('Writing cache')
             try:
-                cache_file = open(default_cache, 'wb')
+                cache_file = open(self.cache_path, 'wb')
                 pickle.dump(self.state,cache_file)
                 cache_file.close()
             except BaseException as e:
                 logging.error(str(e))
             time.sleep(self.config.check_interval)
+def get_arguments():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('config', help='path to the daemon config file in JSON format', type=str)
+    return parser.parse_args()
 
 def main():
+    args = get_arguments()
     logfile_name = 'url-diff-' + time.strftime('%d-%m-%Y') + '.log'
     logging.basicConfig(filename=logfile_name,format='%(asctime)s:%(levelname)s:%(message)s',level=logging.INFO)
-    conf = config.load_config(default_config) 
+    conf = config.load_config(args.config) 
 
     try:
         cache_file = open(default_cache, 'rb')
@@ -72,7 +78,7 @@ def main():
     except:
         cache = url_cache()
 
-    proc = daemon(conf, cache)
+    proc = daemon(conf, cache, default_cache)
     proc.start()
 
 if __name__ == '__main__':

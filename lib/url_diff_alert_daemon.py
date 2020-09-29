@@ -4,11 +4,10 @@ from url_diff import url_diff
 import json
 import pickle
 from collections import defaultdict
-from time import sleep
+import time
 from email_alert import send_alert
 import logging
 
-#TO-DO: swap print statements over to log messages to a file
 class config:
     def __init__(self, rules, recipients, interval):
         self.rules = rules
@@ -35,7 +34,7 @@ class daemon:
         self.state = state
 
     def start(self):
-        print('Starting daemon')
+        logging.info('Starting daemon')
         while True:
             for rule in self.config.rules:
                 url = rule['url']
@@ -45,23 +44,25 @@ class daemon:
                     if result:
                         if result[0]:
                             subject_line = 'Url diff for ' + url + ' : ' + regex
-                            print('Emailing: ' + subject_line)
+                            logging.info('Emailing: %s', subject_line)
                             send_alert(result[0], self.config.recipients, subject_line)
                         self.state.cache[(url,regex)] = result[1]
                 except BaseException as e:
-                    print(str(e))
+                    logging.error(str(e))
             
             #write the cache, sleep
-            print('Writing cache')
+            logging.info('Writing cache')
             try:
                 cache_file = open(default_cache, 'wb')
                 pickle.dump(self.state,cache_file)
                 cache_file.close()
             except BaseException as e:
-                print(str(e))
-            sleep(self.config.check_interval)
+                logging.error(str(e))
+            time.sleep(self.config.check_interval)
 
 def main():
+    logfile_name = 'url-diff-' + time.strftime('%d-%m-%Y') + '.log'
+    logging.basicConfig(filename=logfile_name,format='%(asctime)s:%(levelname)s:%(message)s',level=logging.INFO)
     conf = config.load_config(default_config) 
 
     try:

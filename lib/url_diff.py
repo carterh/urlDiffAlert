@@ -3,6 +3,7 @@
 import requests
 import difflib
 import re
+import logging
 
 #Takes a url and optional regex.  If the diff of the cached version with the latest version contains regex, return the HTML diff.  Otherwise return None.
 def url_diff(url, regex, cache_page, include_diff=False):
@@ -22,7 +23,7 @@ def url_diff(url, regex, cache_page, include_diff=False):
         else:
             return None
     except BaseException as e:
-        print(str(e))
+        logging.error(str(e))
         return None
 
 def main():
@@ -32,9 +33,12 @@ def main():
         if url == 'quit':
             break
 
-        cache_page = requests.get(url, timeout=1).text
-        results = url_diff(url, '.*', cache_page, include_diff=False)
-        print(results[0])
+        try:
+            cache_page = requests.get(url, timeout=1).text
+            results = url_diff(url, '.*', cache_page, include_diff=False)
+            print(results[0])
+        except BaseException as e:
+            logging.error(str(e))
 
 if __name__ == '__main__':
     main()

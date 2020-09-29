@@ -2,16 +2,21 @@
 
 import requests
 import difflib
+import re
 
 #Takes a url and optional regex.  If the diff of the cached version with the latest version contains regex, return the HTML diff.  Otherwise return None.
 def url_diff(url, regex, cache_page, include_diff=False):
     try: 
         loaded_page = requests.get(url, timeout=1).text
-        #TO-DO: add regex check to see if the regex exists in the updated page.  If it does, alert.  Else, update cache with no alert.
         if cache_page != loaded_page:
-            if include_diff:
-                d = difflib.HtmlDiff()
-                return d.make_file(cache_page.splitlines(), loaded_page.splitlines()), loaded_page
+            d = difflib.HtmlDiff()
+            cache_lines = cache_page.splitlines()
+            loaded_lines = loaded_page.splitlines()
+            compact_diff = d.make_file(cache_lines, loaded_lines, context=True)
+            if not re.search(regex, compact_diff):
+                return None, loaded_page
+            elif include_diff:
+                return compact_diff, loaded_page
             else:
                 return 'There was an update for: ' + url + ' : ' + regex, loaded_page
         else:
@@ -28,7 +33,7 @@ def main():
             break
 
         cache_page = requests.get(url, timeout=1).text
-        results = url_diff(url, '', cache_page)
+        results = url_diff(url, '.*', cache_page, include_diff=False)
         print(results[0])
 
 if __name__ == '__main__':

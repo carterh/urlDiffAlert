@@ -39,10 +39,12 @@ class daemon:
                 url = rule['url']
                 regex = rule['regex']
                 try:
-                    result = url_diff(rule['url'], rule['regex'], self.state.cache[(url,regex)])
+                    result = url_diff(rule['url'], rule['regex'], self.state.cache[(url,regex)], include_diff=True)
                     if result:
-                        print('New result for ' + url + ' , emailing')
-                        send_alert(result[0], self.config.recipients)
+                        if result[0]:
+                            subject_line = 'Url diff for ' + url + ' : ' + regex
+                            print('Emailing: ' + subject_line)
+                            send_alert(result[0], self.config.recipients, subject_line)
                         self.state.cache[(url,regex)] = result[1]
                 except BaseException as e:
                     print(str(e))

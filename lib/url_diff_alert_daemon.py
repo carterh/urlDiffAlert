@@ -46,7 +46,7 @@ class daemon:
                         if result[0]:
                             subject_line = 'Url diff for ' + url + ' : ' + regex
                             logging.info('Emailing: %s', subject_line)
-                            send_alert(result[0], self.config.recipients, subject_line)
+#                            send_alert(result[0], self.config.recipients, subject_line)
                         self.state.cache[(url,regex)] = result[1]
                 except BaseException as e:
                     logging.error(str(e))

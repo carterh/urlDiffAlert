@@ -1,4 +1,8 @@
-[
-	{"url": "https://google.com", "regex": ".*"}, 
-	{"url": "https://yahoo.com", "regex": ".+"}
-]
+{
+	"rules":
+	[
+		{"url": "https://google.com", "regex": ".*"}, 
+		{"url": "https://yahoo.com", "regex": ".+"}
+	],
+	"recipients":["address@example.com"]
+}

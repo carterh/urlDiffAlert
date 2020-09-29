@@ -42,8 +42,8 @@ class daemon:
                     result = url_diff(rule['url'], rule['regex'], self.state.cache[(url,regex)])
                     if result:
                         print('New result for ' + url + ' , emailing')
-                        send_alert(result, ['ratherBrehearsin@yahoo.com'])
-                        self.state.cache[(url,regex)] = result
+                        send_alert(result[0], self.config.recipients)
+                        self.state.cache[(url,regex)] = result[1]
                 except BaseException as e:
                     print(str(e))
             

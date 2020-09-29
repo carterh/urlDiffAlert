@@ -10,29 +10,27 @@ import logging
 import argparse
 
 class config:
-    def __init__(self, rules, recipients, interval):
+    def __init__(self, rules, recipients, interval, cache_path):
         self.rules = rules
         self.recipients = recipients
         self.check_interval = interval*60
+        self.cache_path = cache_path
 
     @staticmethod
     def load_config(path):
         config_file = open(path)
         config_map = json.load(config_file)
         config_file.close()
-        return config(config_map['rules'], config_map['recipients'], config_map['check_interval'])
-
-default_cache = './temp/url_cache.bin'
+        return config(config_map['rules'], config_map['recipients'], config_map['check_interval'], config_map['cache_path'])
 
 class url_cache:
     def __init__(self):
         self.cache = defaultdict(str)
 
 class daemon:
-    def __init__(self, config, state, path):
+    def __init__(self, config, state):
         self.config = config
         self.state = state
-        self.cache_path = path
 
     def start(self):
         logging.info('Starting daemon')
@@ -54,7 +52,7 @@ class daemon:
             #write the cache, sleep
             logging.info('Writing cache')
             try:
-                cache_file = open(self.cache_path, 'wb')
+                cache_file = open(self.config.cache_path, 'wb')
                 pickle.dump(self.state,cache_file)
                 cache_file.close()
             except BaseException as e:
@@ -72,13 +70,13 @@ def main():
     conf = config.load_config(args.config) 
 
     try:
-        cache_file = open(default_cache, 'rb')
+        cache_file = open(conf.cache_path, 'rb')
         cache = pickle.load(cache_file)
         cache_file.close()
     except:
         cache = url_cache()
 
-    proc = daemon(conf, cache, default_cache)
+    proc = daemon(conf, cache)
     proc.start()
 
 if __name__ == '__main__':

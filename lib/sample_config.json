@@ -5,5 +5,6 @@
 		{"url": "https://yahoo.com", "regex": ".+"}
 	],
 	"recipients":["address@example.com"],
-	"check_interval":10
+	"check_interval":10,
+	"cache_path":"./temp/url_cache.bin"
 }

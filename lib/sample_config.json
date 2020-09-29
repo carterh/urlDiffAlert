@@ -4,5 +4,6 @@
 		{"url": "https://google.com", "regex": ".*"}, 
 		{"url": "https://yahoo.com", "regex": ".+"}
 	],
-	"recipients":["address@example.com"]
+	"recipients":["address@example.com"],
+	"check_interval":10
 }

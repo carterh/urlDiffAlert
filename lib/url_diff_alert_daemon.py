@@ -6,19 +6,21 @@ import pickle
 from collections import defaultdict
 from time import sleep
 from email_alert import send_alert
+import logging
 
+#TO-DO: swap print statements over to log messages to a file
 class config:
-    def __init__(self, rules, recipients):
+    def __init__(self, rules, recipients, interval):
         self.rules = rules
         self.recipients = recipients
-        self.check_interval = 5*60
+        self.check_interval = interval*60
 
     @staticmethod
     def load_config(path):
         config_file = open(path)
         config_map = json.load(config_file)
         config_file.close()
-        return config(config_map['rules'], config_map['recipients'])
+        return config(config_map['rules'], config_map['recipients'], config_map['check_interval'])
 
 default_cache = './temp/url_cache.bin'
 default_config = './config.json'

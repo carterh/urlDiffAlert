@@ -7,3 +7,4 @@ Useful resources:
 * https://3.python-requests.org/
 * https://docs.python.org/3/library/pickle.html
 * https://docs.python.org/3/howto/logging.html
+* https://docs.python.org/3/howto/argparse.html

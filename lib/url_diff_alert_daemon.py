@@ -10,18 +10,20 @@ import logging
 import argparse
 
 class config:
-    def __init__(self, rules, recipients, interval, cache_path):
+    def __init__(self, rules, recipients, interval, cache_path, sender, smtp_server):
         self.rules = rules
         self.recipients = recipients
         self.check_interval = interval*60
         self.cache_path = cache_path
+        self.sender = sender
+        self.smtp_server = smtp_server
 
     @staticmethod
     def load_config(path):
         config_file = open(path)
         config_map = json.load(config_file)
         config_file.close()
-        return config(config_map['rules'], config_map['recipients'], config_map['check_interval'], config_map['cache_path'])
+        return config(config_map['rules'], config_map['recipients'], config_map['check_interval'], config_map['cache_path'], config_map['sender'], config_map['smtp_server'])
 
 class url_cache:
     def __init__(self):
@@ -44,7 +46,7 @@ class daemon:
                         if result[0]:
                             subject_line = 'Url diff for ' + url + ' : ' + regex
                             logging.info('Emailing: %s', subject_line)
-#                            send_alert(result[0], self.config.recipients, subject_line)
+#                            send_alert(result[0], self.config.recipients, subject_line, self.config.sender, self.config.smtp_server)
                         self.state.cache[(url,regex)] = result[1]
                 except BaseException as e:
                     logging.error(str(e))
